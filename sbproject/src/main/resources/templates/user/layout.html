@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" layout:decorate="~{user/layout}">
+<head>
+    <title th:text="${title}">Default Title</title>
+</head>
+<body>
+<header th:replace="user/fragments/header :: header"></header>
+<main layout:fragment="content"></main>
+<footer th:replace="user/fragments/footer :: footer"></footer>
+<script th:replace="user/fragments/script"></script>
+</body>
+</html>

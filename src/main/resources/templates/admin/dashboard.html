@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="admin/fragments/head.html :: head"></head>
+
+<body>
+<!-- Extend layout -->
+<div th:replace="admin/layout :: layout(pageContent='this :: dashboardContent')"></div>
+
+<!-- Content for dashboard page -->
+<div th:fragment="dashboardContent">
+    <div class="container-fluid p-0">
+        <h1 class="h3 mb-3"><strong>Analytics</strong> Dashboard</h1>
+        <!-- Add your dashboard content here -->
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,42 @@
+<div th:fragment="script">
+    <script src="user/js/bootstrap.min.js"></script>
+    <script src="user/js/jquery.scrollUp.min.js"></script>
+    <script src="user/js/price-range.js"></script>
+    <script src="user/js/jquery.prettyPhoto.js"></script>
+    <script src="user/js/main.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Function to update active sidebar item
+            function updateActiveSidebar() {
+                const currentPath = window.location.pathname;
+                const sidebarLinks = document.querySelectorAll('.sidebar-link');
+
+                // Remove active class from all sidebar items
+                sidebarLinks.forEach(link => {
+                    const sidebarItem = link.closest('.sidebar-item');
+                    sidebarItem.classList.remove('active');
+                });
+
+                // Add active class to the matching link
+                sidebarLinks.forEach(link => {
+                    if (link.getAttribute('href') === currentPath) {
+                        const sidebarItem = link.closest('.sidebar-item');
+                        sidebarItem.classList.add('active');
+                    }
+                });
+            }
+
+            // Initial update on page load
+            updateActiveSidebar();
+
+            // Add click event listener to each sidebar link
+            const sidebarLinks = document.querySelectorAll('.sidebar-link');
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', function () {
+                    // Update active sidebar on click
+                    updateActiveSidebar();
+                });
+            });
+        });
+    </script>
+</div>

@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:insert="admin/fragments/head.html :: head">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Management</title>
+
+    <!-- CSS Links -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.32/sweetalert2.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="wrapper">
+    <!-- Sidebar and Navbar -->
+    <div th:insert="admin/fragments/navba :: nav"></div>
+    <div class="main">
+        <nav class="navbar navbar-expand navbar-light navbar-bg">
+            <a class="sidebar-toggle js-sidebar-toggle">
+                <i class="hamburger align-self-center"></i>
+            </a>
+            <div class="navbar-collapse collapse">
+                <!-- Remove the Add Product button from here -->
+            </div>
+        </nav>
+
+        <main class="content">
+            <h1 class="h3 mb-3">Product Management</h1>
+            <div class="d-flex justify-content-between mb-3">
+                <!-- Search Input aligned to the left -->
+                <div class="me-auto">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search products...">
+                </div>
+
+                <!-- Add Category Button aligned to the right -->
+                <div class="d-flex">
+                    <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                        <i class="fas fa-plus me-2"></i> <!-- Plus Icon -->
+                        <i class="fa-solid fa-list"></i> <!-- Category Icon -->
+                    </button>
+                    <button class="btn btn-primary ms-2" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                        <i class="fas fa-plus me-2"></i> <!-- Plus Icon -->
+                        <i class="fa-solid fa-truck-ramp-box"></i> <!-- Product Icon -->
+                    </button>
+                </div>
+            </div>
+
+
+            <!-- Product Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Products List</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Add Product Button moved here with d-flex and justify-content-end to float it right -->
+
+                    <table id="productTable" class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+
+                            <th>Product Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Description</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody id="productTableBody">
+                        <!-- Products will be dynamically loaded here -->
+                        </tbody>
+                    </table>
+
+                    <!-- Pagination Controls -->
+                    <div id="paginationControls" class="mt-3">
+                        <!-- Pagination buttons will appear here -->
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer th:insert="admin/fragments/footer :: copy"></footer>
+    </div>
+</div>
+
+<!-- Add Product Modal -->
+<div class="modal fade" id="addProductModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Product</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addProductForm" action="#" method="post">
+                    <input type="hidden" id="editProductId">
+                    <div class="mb-3">
+                        <label for="productName" class="form-label">Product Name</label>
+                        <input type="text" class="form-control" id="productName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="productDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="productDescription" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="productCategory" class="form-label">Category</label>
+                        <select class="form-select" id="productCategory" name="categoryId" required>
+                            <option value="" disabled selected>Select a category</option>
+                            <th:block th:each="category : ${categories}">
+                                <option th:value="${category.id}" th:text="${category.categoryName}"></option>
+                            </th:block>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="productPrice" class="form-label">Price</label>
+                        <input type="number" class="form-control" id="productPrice" step="0.01" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="productImage" class="form-label">Image URL</label>
+                        <input type="url" class="form-control" id="productImage">
+                    </div>
+                    <button type="submit" class="btn btn-success" id="submitButton">Add</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Add Category Modal -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Category</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addCategoryForm">
+                    <div class="mb-3">
+                        <label for="categoryName" class="form-label">Category Name</label>
+                        <input type="text" class="form-control" id="categoryName" required>
+                    </div>
+                    <button type="submit" class="btn btn-success">Add Category</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.32/sweetalert2.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", () => {
+        resetModalForm();
+        // Attach listener to reset modal when closed
+        document.getElementById("addProductModal").addEventListener("hidden.bs.modal", resetModalForm);
+    });
+
+    function resetModalForm() {
+        // Clear input fields
+        document.getElementById("editProductId").value = '';
+        document.getElementById("productName").value = '';
+        document.getElementById("productDescription").value = '';
+        document.getElementById("productPrice").value = '';
+        document.getElementById("productCategory").value = '';
+        document.getElementById("productImage").value = '';
+        document.getElementById("categoryName").value = '';
+
+
+        // Reset modal title and button text
+        document.querySelector(".modal-title").innerText = "Add Product";
+        document.getElementById("submitButton").innerText = "Add";
+        document.getElementById("submitButton").onclick = handleProductSubmit;
+    }
+
+
+    // Pagination Settings
+    const productsPerPage = 10;
+    let currentPage = 1;
+    let products = [];
+    const maxPageButtons = 5; // Limit number of page buttons displayed at a time
+
+    // Function to load products from the server
+    function loadProducts() {
+        fetch("/api/products")
+            .then(response => response.json())
+            .then(data => {
+                products = data;
+                renderTable();
+                renderPagination();
+            })
+            .catch(error => console.error("Error loading products:", error));
+    }
+
+    // Function to render pagination controls
+    function renderPagination() {
+        const totalPages = Math.ceil(products.length / productsPerPage);
+        const paginationControls = document.getElementById("paginationControls");
+
+        let paginationHTML = '';
+
+        // Add "First" and "Previous" buttons
+        if (currentPage > 1) {
+            paginationHTML += `
+                <button class="btn btn-sm btn-secondary" onclick="changePage(1)">First</button>
+                <button class="btn btn-sm btn-secondary" onclick="changePage(${currentPage - 1})">Previous</button>
+            `;
+        }
+
+        // Determine the range of page numbers to display
+        const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
+        const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
+
+        for (let i = startPage; i <= endPage; i++) {
+            paginationHTML += `
+                <button class="btn btn-sm ${i === currentPage ? 'btn-primary' : 'btn-secondary'}" onclick="changePage(${i})">
+                    ${i}
+                </button>
+            `;
+        }
+
+        // Add "Next" and "Last" buttons
+        if (currentPage < totalPages) {
+            paginationHTML += `
+                <button class="btn btn-sm btn-secondary" onclick="changePage(${currentPage + 1})">Next</button>
+                <button class="btn btn-sm btn-secondary" onclick="changePage(${totalPages})">Last</button>
+            `;
+        }
+
+        paginationControls.innerHTML = paginationHTML;
+    }
+
+    // Function to handle page change
+    function changePage(page) {
+        currentPage = page;
+        renderTable();
+        renderPagination();
+    }
+
+    function handleProductSubmit(event) {
+        event.preventDefault();
+
+        const isEditMode = document.getElementById("submitButton").innerText === "Update"; // Check button text
+        const productId = isEditMode ? parseInt(document.getElementById("editProductId").value) : null;
+
+        const productData = {
+            id: productId, // Include only if editing
+            name: document.getElementById("productName").value,
+            description: document.getElementById("productDescription").value,
+            price: parseFloat(document.getElementById("productPrice").value),
+            category: { id: parseInt(document.getElementById("productCategory").value) },
+            imageUrl: document.getElementById("productImage").value || null
+        };
+
+        const endpoint = isEditMode ? `/api/products/update` : `/add_product`;
+        const method = isEditMode ? "PUT" : "POST";
+
+        fetch(endpoint, {
+            method: method,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(productData),
+        })
+            .then(response => {
+                if (response.ok) {
+                    Swal.fire({
+                        icon: "success",
+                        title: isEditMode ? "Updated" : "Added",
+                        text: `Product ${isEditMode ? "updated" : "added"} successfully!`,
+                    }).then(() => loadProducts());
+                    const closeButton = document.querySelector('.btn-close');
+                    if (closeButton) closeButton.click();
+                } else {
+                    throw new Error(`Failed to ${isEditMode ? "update" : "add"} product`);
+                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: error.message,
+                });
+            });
+    }
+
+
+
+    // Function to load product data into the form for editing
+    function editProduct(productId) {
+        fetch(`/api/products/${productId}`)
+            .then(response => response.json())
+            .then(product => {
+                // Populate the modal fields with product data
+                document.getElementById("productName").value = product.name;
+                document.getElementById("productDescription").value = product.description;
+                document.getElementById("productPrice").value = product.price;
+                document.getElementById("productCategory").value = product.category.id;
+                document.getElementById("productImage").value = product.imageUrl || '';
+
+                // Update the submit button to trigger an update
+                document.getElementById("submitButton").innerText = "Update";
+                document.getElementById("submitButton").onclick = () => handleProductUpdate(productId);
+
+                // Show the modal
+                const addProductModal = new bootstrap.Modal(document.getElementById("addProductModal"));
+                addProductModal.show();
+            })
+            .catch(error => {
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "Could not load product details for editing.",
+                });
+            });
+    }
+
+    // Function to handle product updates
+    function handleProductUpdate(productId) {
+        const updatedProduct = {
+            id: productId,
+            name: document.getElementById("productName").value,
+            description: document.getElementById("productDescription").value,
+            price: parseFloat(document.getElementById("productPrice").value),
+            category: { id: parseInt(document.getElementById("productCategory").value) },
+            imageUrl: document.getElementById("productImage").value || null
+        };
+
+        fetch("/api/products/update", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updatedProduct),
+        })
+            .then(response => {
+                if (response.ok) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Updated",
+                        text: "Product updated successfully!",
+                    }).then(() => {
+                        loadProducts();
+                        const closeButton = document.querySelector('.btn-close');
+                        if (closeButton) closeButton.click();
+                    });
+                } else {
+                    throw new Error("Failed to update product");
+                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "Could not update product. Please try again.",
+                });
+            });
+    }
+
+    // Delete Product with Confirmation
+    function deleteProduct(productId) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this action!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`/product/delete?id=${productId}`, { method: "DELETE" })
+                    .then(response => {
+                        if (response.ok) {
+                            Swal.fire({
+                                icon: "success",
+                                title: "Deleted!",
+                                text: "Product has been successfully deleted.",
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                            loadProducts();
+                        } else {
+                            throw new Error("Failed to delete product.");
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error",
+                            text: "Could not delete product. Please try again.",
+                        });
+                    });
+            }
+        });
+    }
+
+    // Handle category submission
+    document.getElementById("addCategoryForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        const categoryName = document.getElementById("categoryName").value;
+
+        if (categoryName) {
+            // Send a request to add the category (adjust API endpoint as necessary)
+            fetch("/api/categories", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ name: categoryName })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Category Added",
+                        text: `Category '${categoryName}' has been added successfully.`,
+                    }).then(() => {
+                        // Close the modal and reset the form
+                        const closeButton = document.querySelector('.btn-close');
+                        if (closeButton) closeButton.click();
+                        document.getElementById("categoryName").value = ''; // Clear input
+                        loadCategories(); // Reload categories list (adjust this function to suit your logic)
+                    });
+                })
+                .catch(error => {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: "Could not add category. Please try again.",
+                    });
+                });
+        } else {
+            Swal.fire({
+                icon: "warning",
+                title: "Category Name Required",
+                text: "Please enter a category name before submitting.",
+            });
+        }
+    });
+
+    function loadCategories() {
+        fetch("/api/categories")
+            .then(response => response.json())
+            .then(categories => {
+                const categorySelect = document.getElementById("productCategory");
+                categorySelect.innerHTML = `<option value="" disabled selected>Select a category</option>`; // Reset options
+                categories.forEach(category => {
+                    categorySelect.innerHTML += `<option value="${category.id}">${category.categoryName}</option>`;
+                });
+            })
+            .catch(error => console.error("Error loading categories:", error));
+    }
+
+    document.getElementById('searchInput').addEventListener('input', filterTable);
+
+    function filterTable() {
+        const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+        renderTable(searchQuery);
+    }
+
+    function renderTable(searchQuery = '') {
+        const productTableBody = document.getElementById("productTableBody");
+        const startIndex = (currentPage - 1) * productsPerPage;
+        const endIndex = Math.min(startIndex + productsPerPage, products.length);
+
+        const filteredProducts = products.filter(product =>
+            product.name.toLowerCase().includes(searchQuery) ||
+            product.category.categoryName.toLowerCase().includes(searchQuery) ||
+            product.description.toLowerCase().includes(searchQuery)
+        );
+
+        const currentProducts = filteredProducts.slice(startIndex, endIndex);
+
+        productTableBody.innerHTML = currentProducts.map((product, index) => `
+        <tr id="row-${product.id}" class="${product.status === 'disable' ? 'hidden-row' : ''}">
+            <td>${startIndex + index + 1}</td>
+            <td class="product-name">${product.name}</td>
+            <td class="product-category">${product.category.categoryName}</td>
+            <td class="product-price">${product.price}</td>
+            <td class="product-description">${product.description}</td>
+            <td>
+                <button class="btn btn-info btn-sm" onclick="toggleRowVisibility(${product.id})">
+                    <i id="icon-${product.id}" class="fas ${product.status === 'disable' ? 'fa-eye-slash' : 'fa-eye'}"></i>
+                </button>
+                <button class="btn btn-warning btn-sm" onclick="editProduct(${product.id})">Edit</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteProduct(${product.id})">Delete</button>
+            </td>
+        </tr>
+    `).join('');
+    }
+
+
+    function toggleRowVisibility(productId) {
+        const row = document.getElementById(`row-${productId}`);
+        const icon = document.getElementById(`icon-${productId}`);
+        const cells = row.querySelectorAll('td:not(:last-child)');
+        const isHidden = row.classList.contains('hidden-row');
+        const newStatus = isHidden ? 'enable' : 'disable'; // Assuming 'enable'/'disable' are the status values
+
+        // Update UI
+        if (isHidden) {
+            row.classList.remove('hidden-row');
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+            cells.forEach(cell => {
+                cell.style.textDecoration = 'none';
+                cell.style.color = ''; // Revert to default color
+            });
+        } else {
+            row.classList.add('hidden-row');
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+            cells.forEach(cell => {
+                cell.style.textDecoration = 'line-through';
+                cell.style.color = 'red'; // Explicitly set text color
+            });
+        }
+
+        // Send status change to backend
+        fetch(`/api/products/${productId}/status?status=${newStatus}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+            .then(response => {
+                if (!response.ok) {
+                    console.error('Failed to update product status');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+
+
+
+
+    // Initialize
+    document.addEventListener("DOMContentLoaded", () => loadProducts());
+</script>
+
+<div th:replace="admin/fragments/scripts :: scriptContent"></div>
+</body>
+</html>

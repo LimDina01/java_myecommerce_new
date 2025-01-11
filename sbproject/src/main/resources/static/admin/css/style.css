@@ -1,0 +1,4 @@
+.sidebar-item.active {
+    background-color: #007bff; /* Change to your preferred color */
+    color: white; /* Change text color if needed */
+}
